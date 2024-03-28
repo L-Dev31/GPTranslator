@@ -1,0 +1,7 @@
+pip install pillow
+pip install tk
+pip install reportlab
+pip install fpdf
+pip install requests
+
+Ou en lançant "dependencies.bat"
