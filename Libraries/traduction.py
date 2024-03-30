@@ -8,21 +8,21 @@ def charger_base_de_donnees(langue_cible): #Chargement de la base de donnée Cre
     with open(nom_fichier, "r", encoding="utf-8") as fichier_json:
         return json.load(fichier_json)
     
-def traduire_texte(texte, langue_source='fr', langue_cible='ht'): #Traduction Creole Guadeloupéen-Français
+def traduire_texte(texte, langue_source='fr', langue_cible='ht'):
     base_de_donnees = charger_base_de_donnees(langue_cible)
     traduction = []
 
-    mots = re.findall(r"[\w’]+(?:'\w+)?|¤+|[^\s,]", texte)
+    mots = re.findall(r"[\w’]+|[^\s,]", texte)
 
     mots_modifies = []
     for mot in mots:
-        if "'" in mot:
-            mot_parts = mot.split("'")
+        if "," in mot:
+            mot_parts = mot.split(",")
             mots_modifies.extend(mot_parts)
         else:
             mots_modifies.append(mot)
 
-    while mots_modifies: #coupe la phrase introduite dans le traducteur mot par mot jusqu'a ce que le groupe de mots existe dans la base de donnée 
+    while mots_modifies:
         for i in range(len(mots_modifies), 0, -1):
             sous_phrase = ' '.join(mots_modifies[:i])
             if sous_phrase.lower() in base_de_donnees:
@@ -32,16 +32,15 @@ def traduire_texte(texte, langue_source='fr', langue_cible='ht'): #Traduction Cr
                 mots_modifies = mots_modifies[i:]
                 print("Mots traduits ajoutés à la liste de traduction.")
                 break
-       
-        else: #regard si le dernier mot existe dans la base de donnée 
-            dernier_mot = mots_modifies[-1].strip(string.punctuation)  # Corrected line
+        else:
+            dernier_mot = mots_modifies[-1].strip(string.punctuation)
             print("Dernier mot après suppression :", dernier_mot)
             if dernier_mot.lower() in base_de_donnees:
                 traduction_mot = base_de_donnees[dernier_mot.lower()]
                 traduction.append(traduction_mot)
-                print("Traduction du dernier mot trouvée dans la base de données :", traduction_mot)    
+                print("Traduction du dernier mot trouvée dans la base de données :", traduction_mot)
 
-            else: #si il n'existe pas traduit le mot en créole haitien 
+            else:
                 print("Mot non trouvé dans la base de données. Tentative de traduction avec Google Translate.")
                 try:
                     traduction_mot = traduire_avec_google_translate(dernier_mot, langue_source, langue_cible)
@@ -54,11 +53,11 @@ def traduire_texte(texte, langue_source='fr', langue_cible='ht'): #Traduction Cr
 
             if dernier_mot == "":
                 print("Dernier mot vide après suppression. Ignoré.")
-                
+
             if mots_modifies:
                 mots_modifies.pop(-1)
 
-    traduction_sans_special = [mot for mot in traduction if mot != " ' "]
+    traduction_sans_special = [mot for mot in traduction if mot != " , "]
 
     return ' '.join(traduction_sans_special)
 
