@@ -27,9 +27,14 @@ output_file = "LngDB-fr.json"
 with open(input_file, 'r', encoding='utf-8') as f:
     data = json.load(f)
 
-inverted_data = {v: k for k, v in data.items()}
+sorted_data = {k: data[k] for k in sorted(data)}
+
+inverted_data = {v: k for k, v in sorted_data.items()}
+sorted_inverted_data = {k: inverted_data[k] for k in sorted(inverted_data)}
 
 with open(output_file, 'w', encoding='utf-8') as f:
-    json.dump(inverted_data, f, indent=4, ensure_ascii=False)
+    json.dump(sorted_inverted_data, f, indent=4, ensure_ascii=False)
 
 print("Inversion de l'ordre terminée. Le résultat est enregistré dans", output_file)
+
+
